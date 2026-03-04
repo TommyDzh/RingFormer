@@ -34,3 +34,16 @@ python train.py --dataset <dataset>
 ```
 --dataset: ('HOPV', 'PFD', 'NFA', 'PD', 'CEPDB')
 
+
+## Citation
+```bibtex
+@inproceedings{ding2025ringformer,
+  title={RingFormer: a ring-enhanced graph transformer for organic solar cell property prediction},
+  author={Ding, Zhihao and Zhang, Ting and Li, Yiran and Shi, Jieming and Zhang, Chen Jason},
+  booktitle={Proceedings of the AAAI Conference on Artificial Intelligence},
+  volume={39},
+  number={1},
+  pages={155--163},
+  year={2025}
+}
+```
