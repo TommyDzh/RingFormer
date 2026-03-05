@@ -22,6 +22,16 @@ pip install -r requirements.txt
 | NFA       | 654     | 118.2        | 133.0        | 15.8         |
 | PD      | 277     | 80.7         | 88.2         | 8.5          |
 
+We provide two complementary dataset releases:
+
+- **Processed ring-graph data (this GitHub repo):**  
+  This repository includes the **processed ring graphs** used by RingFormer (e.g., ring-enhanced graph structures/tensors ready for training and evaluation). Please follow the instructions in this repo to generate/load the ring graphs and reproduce the paper results.
+
+- **Raw CSV tables (🤗 Hugging Face):**  
+  The **original/raw CSV datasets** (CEPDB / HOPV / PFD / NFA / PD) are hosted on Hugging Face at:  
+  https://huggingface.co/datasets/Tommy-DING/organic-solar-cell-molecule-property-prediction  
+  Use this release if you want to inspect the raw columns, reprocess the data with your own featurization, or build alternative graph constructions.
+
 ## Training & Evaluation
 * To construct ring graphs, run this command:
 ```train
