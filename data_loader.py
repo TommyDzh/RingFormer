@@ -236,3 +236,60 @@ class CEPDBDataset(InMemoryDataset):
 
         data, slices = self.collate(data_list)
         torch.save((data, slices), self.processed_paths[0])
+
+
+class CEPDBRingDataset(InMemoryDataset):
+    def __init__(self, root='/data/CEPDB/Ring', transform=None, pre_transform=None, pre_filter=None):
+        super().__init__(root, transform, pre_transform, pre_filter)
+        self.data, self.slices = torch.load(self.processed_paths[0])
+    @property
+    def raw_file_names(self) -> str:
+        return 'CEPDB.csv'
+
+    @property
+    def processed_file_names(self) -> str:
+        return 'data.pt'
+    def download(self):
+        pass
+
+    def process(self):
+        # Read data into huge `Data` list.
+        data_list = []
+        dataset = CEPDBDataset()
+        ring_graphs = torch.load('/data/CEPDB/ring_graphs.pt')
+        for idx, data in enumerate(dataset):
+            edge_index, edge_attr  = ring_graphs[idx].edge_index, ring_graphs[idx].edge_attr
+            if edge_index.shape[1] == 0:
+                edge_index = torch.LongTensor([[0], [0]])
+                edge_attr = torch.LongTensor([[21]]) # 21 is the index of the self-loop edge type
+            data.ring_edge_index = edge_index.long()  
+            data.ring_edge_attr =  edge_attr
+            
+            data.ring_atoms = ring_graphs[idx].ring2atom
+            data.ring_atoms_map = ring_graphs[idx].ring2atom_batch
+            data.ring_edges = ring_graphs[idx].ring2edge
+
+            data.re_atoms = ring_graphs[idx].re2atom
+            data.re_atoms_map = ring_graphs[idx].re2atom_batch
+            data.re_edges = ring_graphs[idx].re2edge
+            data.re_edges_map = ring_graphs[idx].re2edge_batch
+            
+            data.ring_x = ring_graphs[idx].x
+            data.num_graph_edges = data.edge_index.shape[1]
+            data.num_rings = ring_graphs[idx].x.shape[0]
+            data.num_ringatoms = ring_graphs[idx].ring2atom.shape[0]   
+            data.num_ringedges = ring_graphs[idx].ring2edge.shape[0]
+            data.num_re = edge_index.shape[1]     
+            data.num_reatoms = ring_graphs[idx].re2atom.shape[0]        
+            data.num_reedges = ring_graphs[idx].re2edge.shape[0]  
+            data_list.append(data)
+            
+            
+        if self.pre_filter is not None:
+            data_list = [data for data in data_list if self.pre_filter(data)]
+
+        if self.pre_transform is not None:
+            data_list = [self.pre_transform(data) for data in data_list]
+
+        data, slices = self.collate(data_list)
+        torch.save((data, slices), self.processed_paths[0])
